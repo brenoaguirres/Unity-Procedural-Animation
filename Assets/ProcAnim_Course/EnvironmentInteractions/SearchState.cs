@@ -10,7 +10,7 @@ public class SearchState : EnvironmentInteractionState
 
     public override void EnterState()
     {
-        Debug.Log("Here");
+
     }
 
     public override void ExitState()

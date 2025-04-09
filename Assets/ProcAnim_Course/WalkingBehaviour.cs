@@ -31,6 +31,6 @@ public class WalkingBehaviour : MonoBehaviour
 
     private void FixedUpdate()
     {
-        rb.linearVelocity = new Vector3(input.x * ms, 0, input.y * ms);
+        rb.linearVelocity = new Vector3(input.x * ms, rb.linearVelocity.y, input.y * ms);
     }
 }

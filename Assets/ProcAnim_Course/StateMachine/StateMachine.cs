@@ -16,7 +16,6 @@ public abstract class StateMachine<EState> : MonoBehaviour where EState : Enum
     void Update() 
     {
         EState nextStateKey = CurrentState.GetNextState();
-
         if (!IsTransitioningState && nextStateKey.Equals(CurrentState.StateKey))
         {
             CurrentState.UpdateState();
@@ -51,7 +50,7 @@ public abstract class StateMachine<EState> : MonoBehaviour where EState : Enum
     }
 
     void OnTriggerEnter(Collider other) 
-    { 
+    {
         CurrentState.OnTriggerEnter(other);
     }
     void OnTriggerStay(Collider other) 

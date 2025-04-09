@@ -48,10 +48,10 @@ public class EnvironmentInteractionStateMachine : StateMachine<EnvironmentIntera
     {
         // Add States to inherited StateManager "States" dictionary and Set Initial State.
         States.Add(EEnvironmentInteractionState.Reset, new ResetState(_context, EEnvironmentInteractionState.Reset));
-        States.Add(EEnvironmentInteractionState.Search, new ResetState(_context, EEnvironmentInteractionState.Search));
-        States.Add(EEnvironmentInteractionState.Approach, new ResetState(_context, EEnvironmentInteractionState.Approach));
-        States.Add(EEnvironmentInteractionState.Rise, new ResetState(_context, EEnvironmentInteractionState.Rise));
-        States.Add(EEnvironmentInteractionState.Touch, new ResetState(_context, EEnvironmentInteractionState.Touch));
+        States.Add(EEnvironmentInteractionState.Search, new SearchState(_context, EEnvironmentInteractionState.Search));
+        States.Add(EEnvironmentInteractionState.Approach, new ApproachState(_context, EEnvironmentInteractionState.Approach));
+        States.Add(EEnvironmentInteractionState.Rise, new RiseState(_context, EEnvironmentInteractionState.Rise));
+        States.Add(EEnvironmentInteractionState.Touch, new TouchState(_context, EEnvironmentInteractionState.Touch));
 
         CurrentState = States[EEnvironmentInteractionState.Reset];
     }
