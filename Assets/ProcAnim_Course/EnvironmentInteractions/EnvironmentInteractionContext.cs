@@ -29,11 +29,15 @@ public class EnvironmentInteractionContext
     public CapsuleCollider RootCollider => _rootCollider;
     public Transform RootTransform => _rootTransform;
 
+    public float CharacterShoulderHeight { get; private set; }
+
+    public Collider CurrentIntersectingCollider { get; set; }
     public TwoBoneIKConstraint CurrentIKConstraint { get; private set; }
     public MultiRotationConstraint CurrentMultiRotationConstraint { get; private set; }
     public Transform CurrentIKTargetTransform { get; private set; }
     public Transform CurrentShoulderTransform { get; private set; }
     public EBodySide CurrentBodySide { get; private set; }
+    public Vector3 ClosestPointOnColliderFromShoulder { get; set; } = Vector3.positiveInfinity;
 
     public EnvironmentInteractionContext(TwoBoneIKConstraint leftIkConstraint, 
         TwoBoneIKConstraint rightIkConstraint, MultiRotationConstraint leftMultiRotationConstraint, 
@@ -47,6 +51,8 @@ public class EnvironmentInteractionContext
         _rigidbody = rigidbody;
         _rootCollider = rootCollider;
         _rootTransform = rootTransform;
+
+        CharacterShoulderHeight = leftIkConstraint.data.root.transform.position.y;
     }
 
     public void SetCurrentSide(Vector3 positionToCheck)
@@ -57,12 +63,14 @@ public class EnvironmentInteractionContext
         bool isLeftCloser = Vector3.Distance(positionToCheck, leftShoulder) < Vector3.Distance(positionToCheck, rightShoulder);
         if (isLeftCloser)
         {
+            Debug.Log("Touching wall with left arm.");
             CurrentBodySide = EBodySide.LEFT;
             CurrentIKConstraint = _leftIkConstraint;
             CurrentMultiRotationConstraint = _leftMultiRotationConstraint;
         }
         else
         {
+            Debug.Log("Touching wall with right arm.");
             CurrentBodySide = EBodySide.RIGHT;
             CurrentIKConstraint = _rightIkConstraint;
             CurrentMultiRotationConstraint = _rightMultiRotationConstraint;

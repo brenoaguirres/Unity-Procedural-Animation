@@ -18,11 +18,6 @@ public class TouchState : EnvironmentInteractionState
         
     }
 
-    public override void FixedUpdateState()
-    {
-       
-    }
-
     public override EnvironmentInteractionStateMachine.EEnvironmentInteractionState GetNextState()
     {
         return StateKey;

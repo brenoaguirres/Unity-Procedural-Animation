@@ -3,30 +3,37 @@ using UnityEngine;
 
 public class ResetState : EnvironmentInteractionState
 {
+    float _elapsedTime = 0.0f;
+    float _resetDuration = 2.0f;
+
     public ResetState(EnvironmentInteractionContext context, EnvironmentInteractionStateMachine.EEnvironmentInteractionState
         stateKey) : base(context, stateKey)
     {
         Context = context;
     }
 
-    public override void EnterState()
+    public override void EnterState() 
     {
-
+        _elapsedTime = 0.0f;
+        Context.ClosestPointOnColliderFromShoulder = Vector3.positiveInfinity;
+        Context.CurrentIntersectingCollider = null;
     }
 
-    public override void ExitState()
+    public override void UpdateState()
     {
-
+        _elapsedTime += Time.deltaTime;
     }
 
-    public override void FixedUpdateState()
-    {
-
-    }
+    public override void ExitState() { }
 
     public override EnvironmentInteractionStateMachine.EEnvironmentInteractionState GetNextState()
     {
-        return EnvironmentInteractionStateMachine.EEnvironmentInteractionState.Search;
+        bool isMoving = Context.Rigidbody.linearVelocity != Vector3.zero;
+        if (_elapsedTime >= _resetDuration && isMoving)
+        {
+            return EnvironmentInteractionStateMachine.EEnvironmentInteractionState.Search;
+        }
+
         return StateKey;
     }
 
@@ -34,18 +41,12 @@ public class ResetState : EnvironmentInteractionState
     {
 
     }
-
-    public override void OnTriggerExit(Collider other)
-    {
-
-    }
-
     public override void OnTriggerStay(Collider other)
     {
 
     }
 
-    public override void UpdateState()
+    public override void OnTriggerExit(Collider other)
     {
 
     }

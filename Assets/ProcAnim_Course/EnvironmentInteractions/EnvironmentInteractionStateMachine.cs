@@ -34,6 +34,15 @@ public class EnvironmentInteractionStateMachine : StateMachine<EnvironmentIntera
         ConstructEnvironmentDetectionCollider();
     }
 
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.red;
+        if (_context != null && _context.ClosestPointOnColliderFromShoulder != null)
+        {
+            Gizmos.DrawSphere(_context.ClosestPointOnColliderFromShoulder, .03f);
+        }
+    }
+
     private void ValidateConstraints()
     {
         Assert.IsNotNull(_leftIkConstraint, "Left IK Constraint is not assigned.");

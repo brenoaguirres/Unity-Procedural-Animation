@@ -26,20 +26,6 @@ public abstract class StateMachine<EState> : MonoBehaviour where EState : Enum
         }
     }
 
-    void FixedUpdate()
-    {
-        EState nextStateKey = CurrentState.GetNextState();
-
-        if (!IsTransitioningState && nextStateKey.Equals(CurrentState.StateKey))
-        {
-            CurrentState.FixedUpdateState();
-        }
-        else if (!IsTransitioningState)
-        {
-            TransitionToState(nextStateKey);
-        }
-    }
-
     public void TransitionToState(EState stateKey)
     {
         IsTransitioningState = true;

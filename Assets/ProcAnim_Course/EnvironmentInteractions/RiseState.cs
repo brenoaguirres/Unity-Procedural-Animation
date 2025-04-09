@@ -18,11 +18,6 @@ public class RiseState : EnvironmentInteractionState
 
     }
 
-    public override void FixedUpdateState()
-    {
-
-    }
-
     public override EnvironmentInteractionStateMachine.EEnvironmentInteractionState GetNextState()
     {
         return StateKey;
