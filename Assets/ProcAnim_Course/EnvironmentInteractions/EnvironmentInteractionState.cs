@@ -1,16 +1,33 @@
 using UnityEngine;
 
-public class EnvironmentInteractionState : MonoBehaviour
+public abstract class EnvironmentInteractionState : BaseState<EnvironmentInteractionStateMachine.EEnvironmentInteractionState>
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    protected EnvironmentInteractionContext Context;
+
+    public EnvironmentInteractionState(EnvironmentInteractionContext context, EnvironmentInteractionStateMachine.EEnvironmentInteractionState
+        stateKey) : base(stateKey)
     {
-        
+        Context = context;
     }
 
-    // Update is called once per frame
-    void Update()
+    private Vector3 GetClosestPointOnCollider(Collider intersectingCollider, Vector3 positionToCheck)
     {
-        
+        return intersectingCollider.ClosestPoint(positionToCheck);
+    }
+    
+    protected void StartIKTargetPositionTracking(Collider intersectingCollider)
+    {
+        Vector3 closestPointFromRoot = GetClosestPointOnCollider(intersectingCollider, Context.RootTransform.position);
+        Context.SetCurrentSide(closestPointFromRoot);
+    }
+
+    protected void UpdateIKTargetPosition(Collider intersectingCollider)
+    {
+
+    }
+
+    protected void ResetIKTargetPositionTracking(Collider intersectingCollider)
+    {
+
     }
 }

@@ -13,6 +13,8 @@ public class EnvironmentInteractionStateMachine : StateMachine<EnvironmentIntera
         Reset
     }
 
+    private EnvironmentInteractionContext _context;
+
     [SerializeField] private TwoBoneIKConstraint _leftIkConstraint;
     [SerializeField] private TwoBoneIKConstraint _rightIkConstraint;
     [SerializeField] private MultiRotationConstraint _leftMultiRotationConstraint;
@@ -23,6 +25,13 @@ public class EnvironmentInteractionStateMachine : StateMachine<EnvironmentIntera
     private void Awake()
     {
         ValidateConstraints();
+
+        _context = new EnvironmentInteractionContext(_leftIkConstraint, _rightIkConstraint,
+            _leftMultiRotationConstraint, _rightMultiRotationConstraint, _rigidbody, _rootCollider,
+            transform.root);
+
+        InitializeStates();
+        ConstructEnvironmentDetectionCollider();
     }
 
     private void ValidateConstraints()
@@ -33,5 +42,29 @@ public class EnvironmentInteractionStateMachine : StateMachine<EnvironmentIntera
         Assert.IsNotNull(_rightMultiRotationConstraint, "Right Multi Rotation Constraint is not assigned.");
         Assert.IsNotNull(_rigidbody, "Rigidbody is not assigned.");
         Assert.IsNotNull(_rootCollider, "Root Collider is not assigned.");
+    }
+
+    private void InitializeStates()
+    {
+        // Add States to inherited StateManager "States" dictionary and Set Initial State.
+        States.Add(EEnvironmentInteractionState.Reset, new ResetState(_context, EEnvironmentInteractionState.Reset));
+        States.Add(EEnvironmentInteractionState.Search, new ResetState(_context, EEnvironmentInteractionState.Search));
+        States.Add(EEnvironmentInteractionState.Approach, new ResetState(_context, EEnvironmentInteractionState.Approach));
+        States.Add(EEnvironmentInteractionState.Rise, new ResetState(_context, EEnvironmentInteractionState.Rise));
+        States.Add(EEnvironmentInteractionState.Touch, new ResetState(_context, EEnvironmentInteractionState.Touch));
+
+        CurrentState = States[EEnvironmentInteractionState.Reset];
+    }
+
+    private void ConstructEnvironmentDetectionCollider()
+    {
+        // a character's wingspan is very close to its height
+        float wingspan = _rootCollider.height;
+
+        BoxCollider boxCollider = gameObject.AddComponent<BoxCollider>();
+        boxCollider.size = new Vector3(wingspan, wingspan, wingspan);
+        boxCollider.center = new Vector3(_rootCollider.center.x, 
+            _rootCollider.center.y + (0.25f * wingspan), _rootCollider.center.z + (0.5f * wingspan));
+        boxCollider.isTrigger = true;
     }
 }

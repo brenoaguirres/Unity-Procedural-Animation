@@ -1,15 +1,49 @@
 using UnityEngine;
 
-public class TouchState : MonoBehaviour
+public class TouchState : EnvironmentInteractionState
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public TouchState(EnvironmentInteractionContext context, EnvironmentInteractionStateMachine.EEnvironmentInteractionState
+        stateKey) : base(context, stateKey)
+    {
+        Context = context;
+    }
+
+    public override void EnterState()
+    {
+       
+    }
+
+    public override void ExitState()
     {
         
     }
 
-    // Update is called once per frame
-    void Update()
+    public override void FixedUpdateState()
+    {
+       
+    }
+
+    public override EnvironmentInteractionStateMachine.EEnvironmentInteractionState GetNextState()
+    {
+        return StateKey;
+    }
+
+    public override void OnTriggerEnter(Collider other)
+    {
+        
+    }
+
+    public override void OnTriggerExit(Collider other)
+    {
+        
+    }
+
+    public override void OnTriggerStay(Collider other)
+    {
+        
+    }
+
+    public override void UpdateState()
     {
         
     }
