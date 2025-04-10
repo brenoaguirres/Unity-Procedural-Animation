@@ -5,6 +5,7 @@ public class ResetState : EnvironmentInteractionState
 {
     float _elapsedTime = 0.0f;
     float _resetDuration = 2.0f;
+    float _lerpDuration = 10.0f;
 
     public ResetState(EnvironmentInteractionContext context, EnvironmentInteractionStateMachine.EEnvironmentInteractionState
         stateKey) : base(context, stateKey)
@@ -22,6 +23,7 @@ public class ResetState : EnvironmentInteractionState
     public override void UpdateState()
     {
         _elapsedTime += Time.deltaTime;
+        Context.InteractionPointYOffset = Mathf.Lerp(Context.InteractionPointYOffset, Context.ColliderCenterY, _elapsedTime / _lerpDuration);
     }
 
     public override void ExitState() { }

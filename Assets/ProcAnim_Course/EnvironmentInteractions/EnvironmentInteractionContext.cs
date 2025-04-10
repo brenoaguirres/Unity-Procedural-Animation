@@ -38,6 +38,8 @@ public class EnvironmentInteractionContext
     public Transform CurrentShoulderTransform { get; private set; }
     public EBodySide CurrentBodySide { get; private set; }
     public Vector3 ClosestPointOnColliderFromShoulder { get; set; } = Vector3.positiveInfinity;
+    public float InteractionPointYOffset { get; set; } = 0;
+    public float ColliderCenterY { get; set; }
 
     public EnvironmentInteractionContext(TwoBoneIKConstraint leftIkConstraint, 
         TwoBoneIKConstraint rightIkConstraint, MultiRotationConstraint leftMultiRotationConstraint, 
@@ -52,7 +54,7 @@ public class EnvironmentInteractionContext
         _rootCollider = rootCollider;
         _rootTransform = rootTransform;
 
-        CharacterShoulderHeight = leftIkConstraint.data.root.transform.position.y;
+        CharacterShoulderHeight = leftIkConstraint.data.root.transform.position.y - _rootCollider.center.y;
     }
 
     public void SetCurrentSide(Vector3 positionToCheck)
