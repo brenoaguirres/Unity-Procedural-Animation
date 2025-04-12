@@ -36,10 +36,10 @@ public class EnvironmentInteractionStateMachine : StateMachine<EnvironmentIntera
 
     private void OnDrawGizmosSelected()
     {
-        Gizmos.color = Color.red;
+        Gizmos.color = Color.green;
         if (_context != null && _context.ClosestPointOnColliderFromShoulder != null)
         {
-            Gizmos.DrawSphere(_context.ClosestPointOnColliderFromShoulder, .03f);
+            Gizmos.DrawSphere(_context.ClosestPointOnColliderFromShoulder, .1f);
         }
     }
 

@@ -6,6 +6,7 @@ public class ResetState : EnvironmentInteractionState
     float _elapsedTime = 0.0f;
     float _resetDuration = 2.0f;
     float _lerpDuration = 10.0f;
+    float _rotationSpeed = 500f;
 
     public ResetState(EnvironmentInteractionContext context, EnvironmentInteractionStateMachine.EEnvironmentInteractionState
         stateKey) : base(context, stateKey)
@@ -24,6 +25,15 @@ public class ResetState : EnvironmentInteractionState
     {
         _elapsedTime += Time.deltaTime;
         Context.InteractionPointYOffset = Mathf.Lerp(Context.InteractionPointYOffset, Context.ColliderCenterY, _elapsedTime / _lerpDuration);
+        
+        Context.CurrentMultiRotationConstraint.weight = Mathf.Lerp(Context.CurrentMultiRotationConstraint.weight, 0,
+            _elapsedTime / _lerpDuration);
+        Context.CurrentIKConstraint.weight = Mathf.Lerp(Context.CurrentIKConstraint.weight, 0,
+            _elapsedTime / _lerpDuration);
+        Context.CurrentIKTargetTransform.localPosition = Vector3.Lerp(Context.CurrentIKTargetTransform.localPosition,
+            Context.CurrentOriginalTargetPosition, _elapsedTime / _lerpDuration);
+        Context.CurrentIKTargetTransform.rotation = Quaternion.RotateTowards(Context.CurrentIKTargetTransform.rotation,
+            Context.OriginalTargetRotation, _rotationSpeed / _lerpDuration);
     }
 
     public override void ExitState() { }

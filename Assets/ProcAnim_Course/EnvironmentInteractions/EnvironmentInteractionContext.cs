@@ -20,6 +20,8 @@ public class EnvironmentInteractionContext
     private Rigidbody _rigidbody;
     private CapsuleCollider _rootCollider;
     private Transform _rootTransform;
+    private Vector3 _leftOriginalTargetPosition;
+    private Vector3 _rightOriginalTargetPosition;
 
     public TwoBoneIKConstraint LeftIkConstraint => _leftIkConstraint;
     public TwoBoneIKConstraint RightIkConstraint => _rightIkConstraint;
@@ -40,6 +42,8 @@ public class EnvironmentInteractionContext
     public Vector3 ClosestPointOnColliderFromShoulder { get; set; } = Vector3.positiveInfinity;
     public float InteractionPointYOffset { get; set; } = 0;
     public float ColliderCenterY { get; set; }
+    public Vector3 CurrentOriginalTargetPosition { get; private set; }
+    public Quaternion OriginalTargetRotation { get; private set; }
 
     public EnvironmentInteractionContext(TwoBoneIKConstraint leftIkConstraint, 
         TwoBoneIKConstraint rightIkConstraint, MultiRotationConstraint leftMultiRotationConstraint, 
@@ -53,8 +57,12 @@ public class EnvironmentInteractionContext
         _rigidbody = rigidbody;
         _rootCollider = rootCollider;
         _rootTransform = rootTransform;
+        _leftOriginalTargetPosition = _leftIkConstraint.data.target.transform.localPosition;
+        _rightOriginalTargetPosition = _rightIkConstraint.data.target.transform.localPosition;
+        OriginalTargetRotation = _leftIkConstraint.data.target.rotation;
 
         CharacterShoulderHeight = leftIkConstraint.data.root.transform.position.y - _rootCollider.center.y;
+        SetCurrentSide(Vector3.positiveInfinity);
     }
 
     public void SetCurrentSide(Vector3 positionToCheck)
@@ -65,17 +73,17 @@ public class EnvironmentInteractionContext
         bool isLeftCloser = Vector3.Distance(positionToCheck, leftShoulder) < Vector3.Distance(positionToCheck, rightShoulder);
         if (isLeftCloser)
         {
-            Debug.Log("Touching wall with left arm.");
             CurrentBodySide = EBodySide.LEFT;
             CurrentIKConstraint = _leftIkConstraint;
             CurrentMultiRotationConstraint = _leftMultiRotationConstraint;
+            CurrentOriginalTargetPosition = _leftOriginalTargetPosition;
         }
         else
         {
-            Debug.Log("Touching wall with right arm.");
             CurrentBodySide = EBodySide.RIGHT;
             CurrentIKConstraint = _rightIkConstraint;
             CurrentMultiRotationConstraint = _rightMultiRotationConstraint;
+            CurrentOriginalTargetPosition = _rightOriginalTargetPosition;
         }
 
         CurrentShoulderTransform = CurrentIKConstraint.data.root.transform;
