@@ -40,7 +40,7 @@ public class ApproachState : EnvironmentInteractionState
     public override EnvironmentInteractionStateMachine.EEnvironmentInteractionState GetNextState()
     {
         bool isOverStateLifeDuration = _elapsedTime >= _approachDuration;
-        if (isOverStateLifeDuration)
+        if (isOverStateLifeDuration || CheckShouldReset())
         {
             return EnvironmentInteractionStateMachine.EEnvironmentInteractionState.Reset;
         }

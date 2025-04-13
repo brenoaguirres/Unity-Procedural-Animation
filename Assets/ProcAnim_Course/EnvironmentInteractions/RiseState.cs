@@ -66,6 +66,11 @@ public class RiseState : EnvironmentInteractionState
 
     public override EnvironmentInteractionStateMachine.EEnvironmentInteractionState GetNextState()
     {
+        if (CheckShouldReset())
+        {
+            return EnvironmentInteractionStateMachine.EEnvironmentInteractionState.Reset;
+        }
+
         if (Vector3.Distance(Context.CurrentIKTargetTransform.position, Context.ClosestPointOnColliderFromShoulder) < _touchDistanceThreshold
             && _elapsedTime > _touchTimeThreshold)
         {

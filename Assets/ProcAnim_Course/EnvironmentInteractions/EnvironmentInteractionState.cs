@@ -3,11 +3,81 @@ using UnityEngine;
 public abstract class EnvironmentInteractionState : BaseState<EnvironmentInteractionStateMachine.EEnvironmentInteractionState>
 {
     protected EnvironmentInteractionContext Context;
+    private float _movingAwayOffset = .005f;
+    private bool _shouldReset;
 
     public EnvironmentInteractionState(EnvironmentInteractionContext context, EnvironmentInteractionStateMachine.EEnvironmentInteractionState
         stateKey) : base(stateKey)
     {
         Context = context;
+    }
+
+    public bool CheckShouldReset()
+    {
+        if (_shouldReset)
+        {
+            Context.LowestDistance = Mathf.Infinity;
+            _shouldReset = false;
+            return true;
+        }
+
+        bool isPlayerStopped = Context.Rigidbody.linearVelocity == Vector3.zero;
+        bool isMovingAway = CheckIsMovingAway();
+        bool isBadAngle = CheckIsBadAngle();
+        bool isPlayerJumping = Mathf.Round(Context.Rigidbody.linearVelocity.y) >= 1;
+
+        if (isPlayerStopped || isMovingAway || isBadAngle || isPlayerJumping)
+        {
+            Context.LowestDistance = Mathf.Infinity;
+            return true;
+        }
+
+        return false;
+    }
+
+    protected bool CheckIsBadAngle()
+    {
+        if (Context.CurrentIntersectingCollider == null)
+        {
+            return false;
+        }
+
+        Vector3 targetDirection = Context.ClosestPointOnColliderFromShoulder - Context.CurrentShoulderTransform.position;
+        Vector3 shoulderDirection = Context.CurrentBodySide == EnvironmentInteractionContext.EBodySide.RIGHT ?
+            Context.RootTransform.right : -Context.RootTransform.right;
+
+        float dotProduct = Vector3.Dot(shoulderDirection, targetDirection.normalized);
+        bool isBadAngle = dotProduct < 0; // this means the target is behind the shoulder
+
+        return isBadAngle;
+    }
+
+    protected bool CheckIsMovingAway()
+    {
+        float currentDistanceToTarget = Vector3.Distance(Context.RootTransform.position,
+            Context.ClosestPointOnColliderFromShoulder);
+
+        bool isSearchingForNewInteraction = Context.CurrentIntersectingCollider == null;
+        if (isSearchingForNewInteraction)
+        {
+            return false;
+        }
+
+        bool isGettingCloserToTarget = currentDistanceToTarget <= Context.LowestDistance;
+        if (isGettingCloserToTarget)
+        {
+            Context.LowestDistance = currentDistanceToTarget;
+            return false;
+        }
+
+        bool isMovingAwayFromTarget = currentDistanceToTarget > Context.LowestDistance + _movingAwayOffset;
+        if (isMovingAwayFromTarget)
+        {
+            Context.LowestDistance = Mathf.Infinity;
+            return true;
+        }
+
+        return false; 
     }
 
     private Vector3 GetClosestPointOnCollider(Collider intersectingCollider, Vector3 positionToCheck)
@@ -42,6 +112,7 @@ public abstract class EnvironmentInteractionState : BaseState<EnvironmentInterac
         {
             Context.CurrentIntersectingCollider = null;
             Context.ClosestPointOnColliderFromShoulder = Vector3.positiveInfinity;
+            _shouldReset = true;
         }
     }
 

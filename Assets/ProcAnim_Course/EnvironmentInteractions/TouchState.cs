@@ -28,7 +28,7 @@ public class TouchState : EnvironmentInteractionState
 
     public override EnvironmentInteractionStateMachine.EEnvironmentInteractionState GetNextState()
     {
-        if (_elapsedTime > _resetThreshold)
+        if (_elapsedTime > _resetThreshold || CheckShouldReset())
         {
             return EnvironmentInteractionStateMachine.EEnvironmentInteractionState.Reset;
         }
