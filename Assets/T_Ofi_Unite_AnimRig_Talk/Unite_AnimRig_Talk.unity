@@ -171,6 +171,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Jammo4
       objectReference: {fileID: 0}
+    - target: {fileID: 2495623852345304760, guid: 3d2fe177e4de70140ab4db89a4e1dcd2, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6466443264767673578, guid: 3d2fe177e4de70140ab4db89a4e1dcd2, type: 3}
       propertyPath: m_RigLayers.Array.size
       value: 1

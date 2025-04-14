@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: b1b874e26e62db949baeec17a89ca9eb
+timeCreated: 1540522597
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 131930
+  packageName: POLYGON City Zombies - Low Poly 3D Art by Synty
+  packageVersion: 1.6.3
+  assetPath: Assets/PolygonZombies/Prefabs/Zombie_Hipster_Male_01.prefab
+  uploadId: 735878

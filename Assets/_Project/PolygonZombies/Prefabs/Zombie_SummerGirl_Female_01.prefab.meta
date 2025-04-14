@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: f91c7ce3a32256e4eb15f8b3e6191a7c
+timeCreated: 1540522630
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 131930
+  packageName: POLYGON City Zombies - Low Poly 3D Art by Synty
+  packageVersion: 1.6.3
+  assetPath: Assets/PolygonZombies/Prefabs/Zombie_SummerGirl_Female_01.prefab
+  uploadId: 735878
