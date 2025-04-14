@@ -16,6 +16,7 @@ public class LookAtObjectAnimationRigging : MonoBehaviour
         _layer = LayerMask.GetMask("Interactable");
 
         _headRig = GetComponent<Rig>();
+        _headRig.weight = 0f;
 
         _headCollider = GetComponent<BoxCollider>();
         _headCollider.isTrigger = true;
