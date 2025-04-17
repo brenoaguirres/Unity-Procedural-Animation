@@ -47,6 +47,7 @@ public class CharacterAiming : MonoBehaviour
         if (Input.GetMouseButton(1))
         {
             _aimLayer.weight = Mathf.Clamp01(_aimLayer.weight + (Time.deltaTime / _aimDuration));
+            _bodyAimLayer.weight = Mathf.Clamp01(_aimLayer.weight + (Time.deltaTime / _aimDuration));
             if (!_laserSight.activeSelf) _laserSight.SetActive(true);
             _isAiming = true;
 
@@ -54,6 +55,7 @@ public class CharacterAiming : MonoBehaviour
         }
 
         _aimLayer.weight = Mathf.Clamp01(_aimLayer.weight - (Time.deltaTime / _aimDuration));
+        _bodyAimLayer.weight = Mathf.Clamp01(_aimLayer.weight - (Time.deltaTime / _aimDuration));
         if (_laserSight.activeSelf) _laserSight.SetActive(false);
         _isAiming = false;
     }
