@@ -24,6 +24,8 @@ public abstract class StateMachine<EState> : MonoBehaviour where EState : Enum
         {
             TransitionToState(nextStateKey);
         }
+
+        UpdateInputs();
     }
 
     public void TransitionToState(EState stateKey)
@@ -47,4 +49,10 @@ public abstract class StateMachine<EState> : MonoBehaviour where EState : Enum
     {
         CurrentState.OnTriggerExit(other);
     }
+
+    protected virtual void UpdateInputs()
+    {
+        // Override this method in derived classes to update inputs
+    }
+
 }

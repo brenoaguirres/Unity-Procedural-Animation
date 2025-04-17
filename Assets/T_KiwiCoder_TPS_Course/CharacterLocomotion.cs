@@ -20,4 +20,13 @@ public class CharacterLocomotion : MonoBehaviour
         _animator.SetFloat("InputX", _input.x);
         _animator.SetFloat("InputY", _input.y);
     }
+
+    private void OnDisable()
+    {
+        _input.x = 0;
+        _input.y = 0;
+
+        _animator.SetFloat("InputX", _input.x);
+        _animator.SetFloat("InputY", _input.y);
+    }
 }
