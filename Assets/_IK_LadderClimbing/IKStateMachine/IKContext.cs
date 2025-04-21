@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
 
@@ -56,6 +57,17 @@ public class IKContext
     public float HangMinimumDistanceFromLadder = 0.4f;
     public float HangMinimumAngleFromLadder = 0.3f;
 
+    public List<LadderStep> LadderStepsRight = new List<LadderStep>();
+    public List<LadderStep> LadderStepsLeft = new List<LadderStep>();
+    public LadderStep HangStepRight;
+    public LadderStep HangStepLeft;
+    public int HangStepRightIndex = 0;
+    public int HangStepLeftIndex = 0;
+    public LadderStep NextStepRight;
+    public LadderStep NextStepLeft;
+
+    public int StepsPerClimb = 2;
+
 
     public Vector3 Input3D = Vector3.zero;
     public bool InputButton = false;
@@ -94,7 +106,6 @@ public class IKContext
 
     public Vector3 GetLadderBase()
     {
-        Debug.Log("GetLadderBase");
         return new Vector3(CurrentIntersectingLadder.transform.position.x,
             CurrentIntersectingLadder.transform.position.y - CurrentIntersectingLadder.bounds.size.y / 2,
             CurrentIntersectingLadder.transform.position.z);

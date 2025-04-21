@@ -1,4 +1,6 @@
 using UnityEngine;
+using System.Linq;
+using UnityEngine.Rendering;
 
 public abstract class IKState : BaseState<IKStateMachine.EState>
 {
@@ -18,6 +20,11 @@ public abstract class IKState : BaseState<IKStateMachine.EState>
             Context.CurrentIntersectingLadder == null)
         {
             Context.CurrentIntersectingLadder = intersectingCollider;
+            Context.LadderStepsLeft = intersectingCollider.GetComponentsInChildren<LadderStep>(true)
+                .ToList().FindAll(x => x.LadderStepSide == LadderStep.ELadderStepSide.L);
+            Context.LadderStepsRight = intersectingCollider.GetComponentsInChildren<LadderStep>(true)
+                .ToList().FindAll(x => x.LadderStepSide == LadderStep.ELadderStepSide.R);
+
             SetIKTargetPosition();
         }
     }
@@ -35,6 +42,8 @@ public abstract class IKState : BaseState<IKStateMachine.EState>
         if (intersectingCollider == Context.CurrentIntersectingLadder)
         {
             Context.CurrentIntersectingLadder = null;
+            Context.LadderStepsLeft.Clear();
+            Context.LadderStepsRight.Clear();
         }
     }
 
