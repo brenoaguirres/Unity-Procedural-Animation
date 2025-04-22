@@ -34,7 +34,7 @@ public class IKStateHang : IKState
     {
         if (CanClimb)
         {
-            //ResetLadderHangPositions();
+            AssignLadderClimbPositions();
             return IKStateMachine.EState.Climbing;
         }
 
@@ -58,7 +58,7 @@ public class IKStateHang : IKState
 
     public void CheckHandsConnected()
     {
-        float distanceThreshold = 0.4f;
+        float distanceThreshold = 0.2f;
 
         if (LeftHandConnected || Vector3.Distance(Context.LeftHandIKConstraint.data.target.transform.position,
                 Context.NextStepLeft.transform.position) <= distanceThreshold)
@@ -138,19 +138,15 @@ public class IKStateHang : IKState
             ? null : Context.LadderStepsRight[Context.HangStepRightIndex + 1];
     }
 
-    public void ResetLadderHangPositions()
+    public void AssignLadderClimbPositions()
     {
-        Context.HangStepLeft = null;
-        Context.HangStepRight = null;
-        Context.NextStepRight = null;
-        Context.NextStepLeft = null;
-        Context.HangStepRightIndex = 0;
-        Context.HangStepLeftIndex = 0;
+        Context.NextStepRight = Context.LadderStepsRight[Context.HangStepRightIndex + 2];
+        Context.NextStepLeft = Context.LadderStepsLeft[Context.HangStepLeftIndex + 2];
     }
 
     public void TestInputs()
     {
-        float ms = Time.deltaTime * 0.3f;
+        float ms = Time.deltaTime * 0.7f;
 
         if (Input.GetKey(KeyCode.Q))
         {

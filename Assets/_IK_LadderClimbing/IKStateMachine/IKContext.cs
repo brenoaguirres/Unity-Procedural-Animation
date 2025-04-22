@@ -59,6 +59,16 @@ public class IKContext
 
     public List<LadderStep> LadderStepsRight = new List<LadderStep>();
     public List<LadderStep> LadderStepsLeft = new List<LadderStep>();
+
+    public LadderStep CurrentLeftHandStep;
+    public LadderStep CurrentRightHandStep;
+    public LadderStep CurrentLeftFootStep;
+    public LadderStep CurrentRightFootStep;
+    public LadderStep TargetLeftHandStep;
+    public LadderStep TargetRightHandStep;
+    public LadderStep TargetLeftFootStep;
+    public LadderStep TargetRightFootStep;
+
     public LadderStep HangStepRight;
     public LadderStep HangStepLeft;
     public int HangStepRightIndex = 0;
@@ -109,5 +119,62 @@ public class IKContext
         return new Vector3(CurrentIntersectingLadder.transform.position.x,
             CurrentIntersectingLadder.transform.position.y - CurrentIntersectingLadder.bounds.size.y / 2,
             CurrentIntersectingLadder.transform.position.z);
+    }
+
+    public LadderStep GetClosestLadderStepToIKBone(TwoBoneIKConstraint bone, List<LadderStep> steps)
+    {
+        LadderStep closestLadderStep = null;
+        int index = 0;
+        int closestIndex = 0;
+
+        foreach (LadderStep step in steps)
+        {
+            if (closestLadderStep == null)
+            {
+                closestLadderStep = step;
+                closestIndex = index;
+            }
+
+            if (Vector3.Distance(bone.data.target.transform.position,
+                step.transform.position) <
+                Vector3.Distance(bone.data.target.transform.position,
+                closestLadderStep.transform.position))
+            {
+                closestLadderStep = step;
+                closestIndex = index;
+            }
+
+            index++;
+        }
+
+        return closestLadderStep;
+    }
+
+    public LadderStep GetNextLadderStep(LadderStep step, List<LadderStep> steps)
+    {
+        if (steps.Contains(step)) return steps[steps.IndexOf(step) + 1];
+        else
+        {
+            Debug.LogError("Next step not found in list of steps.");
+            return null;
+        }
+    }
+
+    public bool IsLastStep(LadderStep step, List<LadderStep> steps)
+    {
+        return steps.IndexOf(step) + 1 > steps.Count - 1;
+    }
+
+    public void SetAllTargetSteps()
+    {
+        CurrentLeftHandStep = GetClosestLadderStepToIKBone(LeftHandIKConstraint, LadderStepsLeft);
+        CurrentRightHandStep = GetClosestLadderStepToIKBone(RightHandIKConstraint, LadderStepsRight);
+        CurrentLeftFootStep = GetClosestLadderStepToIKBone(LeftFootIKConstraint, LadderStepsLeft);
+        CurrentRightFootStep = GetClosestLadderStepToIKBone(RightFootIKConstraint, LadderStepsRight);
+
+        TargetLeftHandStep = GetNextLadderStep(CurrentLeftHandStep, LadderStepsLeft);
+        TargetRightHandStep = GetNextLadderStep(CurrentRightHandStep, LadderStepsRight);
+        TargetLeftFootStep = GetNextLadderStep(CurrentLeftFootStep, LadderStepsLeft);
+        TargetRightFootStep = GetNextLadderStep(CurrentRightFootStep, LadderStepsRight);
     }
 }
