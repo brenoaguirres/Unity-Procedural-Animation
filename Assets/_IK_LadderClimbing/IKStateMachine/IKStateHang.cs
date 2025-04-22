@@ -15,7 +15,7 @@ public class IKStateHang : IKState
         Debug.Log("Enter HANG State");
         Context.DisableLocomotion();
         Context.EnableAllIKImmediate();
-        StartLadderHangPositions();
+        AssignLadderClimbPositions();
         LeftHandConnected = false;
         RightHandConnected = false;
         CanClimb = false;
@@ -61,87 +61,25 @@ public class IKStateHang : IKState
         float distanceThreshold = 0.2f;
 
         if (LeftHandConnected || Vector3.Distance(Context.LeftHandIKConstraint.data.target.transform.position,
-                Context.NextStepLeft.transform.position) <= distanceThreshold)
+                Context.TargetLeftHandStep.transform.position) <= distanceThreshold)
         {
             LeftHandConnected = true;
             Context.LeftHandIKConstraint.data.target.transform.position =
-                Context.NextStepLeft.transform.position;
+                Context.TargetLeftHandStep.transform.position;
         }
 
         if (RightHandConnected || Vector3.Distance(Context.RightHandIKConstraint.data.target.transform.position,
-                Context.NextStepRight.transform.position) <= distanceThreshold)
+                Context.TargetRightHandStep.transform.position) <= distanceThreshold)
         {
             RightHandConnected = true;
             Context.RightHandIKConstraint.data.target.transform.position =
-                Context.NextStepRight.transform.position;
+                Context.TargetRightHandStep.transform.position;
         }
-    }
-
-    public void StartLadderHangPositions()
-    {
-        LadderStep closestLadderStep = null;
-        int index = 0;
-        int closestIndex = 0;
-
-        foreach (LadderStep step in Context.LadderStepsLeft)
-        {
-            if (closestLadderStep == null)
-            {
-                closestLadderStep = step;
-                closestIndex = index;
-            }
-
-            if (Vector3.Distance(Context.LeftHandIKConstraint.data.target.transform.position,
-                step.transform.position) <
-                Vector3.Distance(Context.LeftHandIKConstraint.data.target.transform.position,
-                closestLadderStep.transform.position))
-            {
-                closestLadderStep = step;
-                closestIndex = index;
-            }
-
-            index++;
-        }
-
-        Context.HangStepLeft = closestLadderStep;
-        Context.HangStepLeftIndex = closestIndex;
-        Context.NextStepLeft = (Context.HangStepLeftIndex + 1 >= Context.LadderStepsLeft.Count)
-            ? null : Context.LadderStepsLeft[Context.HangStepLeftIndex + 1];
-
-        closestLadderStep = null;
-        index = 0;
-        closestIndex = 0;
-
-        foreach (LadderStep step in Context.LadderStepsRight)
-        {
-            if (closestLadderStep == null)
-            {
-                closestLadderStep = step;
-                closestIndex = index;
-            }
-
-            if (Vector3.Distance(Context.RightHandIKConstraint.data.target.transform.position,
-                step.transform.position) <
-                Vector3.Distance(Context.RightHandIKConstraint.data.target.transform.position,
-                closestLadderStep.transform.position))
-            {
-                closestLadderStep = step;
-                closestIndex = index;
-            }
-
-            index++;
-        }
-
-        Context.HangStepRight = closestLadderStep;
-        Context.HangStepRightIndex = closestIndex;
-        Context.NextStepRight = (Context.HangStepRightIndex + 1 >= Context.LadderStepsRight.Count)
-            ? null : Context.LadderStepsRight[Context.HangStepRightIndex + 1];
     }
 
     public void AssignLadderClimbPositions()
     {
-        Context.NextStepRight = Context.LadderStepsRight[Context.HangStepRightIndex + 2];
-        Context.NextStepLeft = Context.LadderStepsLeft[Context.HangStepLeftIndex + 2];
+        Context.SetAllTargetSteps();
     }
 
     public void TestInputs()
