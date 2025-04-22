@@ -93,6 +93,8 @@ public class IKContext
     public float DistanceBetweenSteps => GetDistanceBetweenSteps();
     public const int FullBodyStepsDistance = 5;
 
+    public bool IsStartingLadderInteraction = true;
+
     public void EnableAllIKImmediate()
     {
         LeftHandIKConstraint.weight = 1f;

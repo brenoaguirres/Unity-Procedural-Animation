@@ -44,6 +44,7 @@ public abstract class IKState : BaseState<IKStateMachine.EState>
             Context.CurrentIntersectingLadder = null;
             Context.LadderStepsLeft.Clear();
             Context.LadderStepsRight.Clear();
+            Context.IsStartingLadderInteraction = true;
         }
     }
 

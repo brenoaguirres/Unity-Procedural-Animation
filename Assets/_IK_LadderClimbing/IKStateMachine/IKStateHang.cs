@@ -33,14 +33,13 @@ public class IKStateHang : IKState
     {
         if (Context.CheckLastStep())
         {
-            // change later to exit climb state
-            Debug.Log("Im in last step of ladder, exiting climb state");
-            return StateKey;
+            // Return new state
         }
 
         if (CanClimb)
         {
             AssignLadderClimbPositions();
+            Context.IsStartingLadderInteraction = false;
             return IKStateMachine.EState.Climbing;
         }
 
@@ -91,7 +90,10 @@ public class IKStateHang : IKState
 
     public void AssignLadderClimbPositions()
     {
-        Context.SetAllStartingSteps();
+        if (Context.IsStartingLadderInteraction)
+            Context.SetAllStartingSteps();
+        else
+            Context.SetAllTargetSteps();
     }
 
     public void TestInputs()
