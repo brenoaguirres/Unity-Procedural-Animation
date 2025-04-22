@@ -4,6 +4,11 @@ using UnityEngine.Animations.Rigging;
 
 public class IKContext
 {
+    public enum EClimbingSide
+    {
+        LEFT,
+        RIGHT
+    }
 
     public IKContext(TwoBoneIKConstraint leftHandIK, TwoBoneIKConstraint rightHandIK, TwoBoneIKConstraint leftFootIK, TwoBoneIKConstraint rightFootIK,
         MultiAimConstraint headMultiAim, MultiParentConstraint hipsMultiParent, Rigidbody rootRigidbody, CapsuleCollider rootCollider,
@@ -78,6 +83,7 @@ public class IKContext
 
     public int StepsPerClimb = 2;
 
+    public EClimbingSide ClimbingSide = EClimbingSide.RIGHT;
 
     public Vector3 Input3D = Vector3.zero;
     public bool InputButton = false;
@@ -152,7 +158,12 @@ public class IKContext
 
     public LadderStep GetNextLadderStep(LadderStep step, List<LadderStep> steps)
     {
-        if (steps.Contains(step)) return steps[steps.IndexOf(step) + 1];
+        if (IsLastStep(step, steps))
+        {
+            return null;
+        }
+
+        if (steps.Contains(step)) return steps[steps.IndexOf(step) + 2];
         else
         {
             Debug.LogError("Next step not found in list of steps.");
@@ -162,7 +173,17 @@ public class IKContext
 
     public bool IsLastStep(LadderStep step, List<LadderStep> steps)
     {
-        return steps.IndexOf(step) + 1 > steps.Count - 1;
+        return steps.IndexOf(step) + 2 > steps.Count - 1;
+    }
+
+    public bool CheckLastStep()
+    {
+        if (ClimbingSide == EClimbingSide.RIGHT)
+            if (IsLastStep(CurrentRightHandStep, LadderStepsRight)) return true;
+        else
+            if (IsLastStep(CurrentLeftHandStep, LadderStepsLeft)) return true;
+
+        return false;
     }
 
     public void SetAllTargetSteps()

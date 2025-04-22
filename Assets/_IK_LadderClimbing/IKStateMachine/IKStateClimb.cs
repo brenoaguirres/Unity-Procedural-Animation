@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class IKStateClimb : IKState
 {
@@ -11,7 +12,6 @@ public class IKStateClimb : IKState
     public float ClimbSpeed = 0.5f;
     public int RemainingSteps;
 
-    public bool RightSideClimb = true;
     public Vector3 StepHandStartingPosition;
     public Vector3 StepFootStartingPosition;
     public float LerpPosition = 0f;
@@ -31,6 +31,12 @@ public class IKStateClimb : IKState
     }
     public override void UpdateState()
     {
+        if(Context.CheckLastStep())
+        {
+            RemainingSteps = 0;
+            return;
+        }
+
         switch (ClimbState)
         {
             case EClimbState.START:
@@ -66,7 +72,7 @@ public class IKStateClimb : IKState
     public EClimbState StartClimbStep()
     {
         Debug.Log("Start Climb");
-        if (RightSideClimb)
+        if (Context.ClimbingSide == IKContext.EClimbingSide.RIGHT)
         {
             StepHandStartingPosition = Context.RightHandIKConstraint.data.target.transform.position;
             StepFootStartingPosition = Context.LeftFootIKConstraint.data.target.transform.position;
@@ -85,7 +91,7 @@ public class IKStateClimb : IKState
     {
         if (LerpPosition >= 1f) return EClimbState.FINISH;
 
-        if (RightSideClimb)
+        if (Context.ClimbingSide == IKContext.EClimbingSide.RIGHT)
         {
             Context.RightHandIKConstraint.data.target.transform.position =
                 Vector3.Lerp(StepHandStartingPosition, Context.TargetRightHandStep.transform.position, LerpPosition);
@@ -102,12 +108,16 @@ public class IKStateClimb : IKState
             LerpPosition += Time.deltaTime / LerpSpeed;
         }
 
+        // Set hips to middle y position between hands and feet
+
         return EClimbState.UPDATE;
     }
 
     public EClimbState FinishClimbStep()
     {
-        RightSideClimb = !RightSideClimb;
+        Context.ClimbingSide = Context.ClimbingSide == IKContext.EClimbingSide.RIGHT? 
+            IKContext.EClimbingSide.LEFT : IKContext.EClimbingSide.RIGHT;
+
         LerpPosition = 0f;
         StepHandStartingPosition = Vector3.zero;
         RemainingSteps--;

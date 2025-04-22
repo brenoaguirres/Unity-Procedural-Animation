@@ -32,6 +32,13 @@ public class IKStateHang : IKState
 
     public override IKStateMachine.EState GetNextState()
     {
+        if (Context.CheckLastStep())
+        {
+            // change later to exit climb state
+            Debug.Log("Im in last step of ladder, exiting climb state");
+            //return IKStateMachine.EState.Idle;
+        }
+
         if (CanClimb)
         {
             AssignLadderClimbPositions();
