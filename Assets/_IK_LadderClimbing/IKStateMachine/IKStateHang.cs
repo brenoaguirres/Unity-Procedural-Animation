@@ -24,7 +24,6 @@ public class IKStateHang : IKState
     {
         TestInputs();
         CheckHandsConnected();
-
         if (LeftHandConnected && RightHandConnected) CanClimb = true;
     }
 
@@ -36,7 +35,7 @@ public class IKStateHang : IKState
         {
             // change later to exit climb state
             Debug.Log("Im in last step of ladder, exiting climb state");
-            //return IKStateMachine.EState.Idle;
+            return StateKey;
         }
 
         if (CanClimb)
@@ -73,7 +72,11 @@ public class IKStateHang : IKState
             LeftHandConnected = true;
             Context.LeftHandIKConstraint.data.target.transform.position =
                 Context.TargetLeftHandStep.transform.position;
+            Context.RightFootIKConstraint.data.target.transform.position =
+                Context.TargetRightFootStep.transform.position;
         }
+
+        if (!LeftHandConnected) return;
 
         if (RightHandConnected || Vector3.Distance(Context.RightHandIKConstraint.data.target.transform.position,
                 Context.TargetRightHandStep.transform.position) <= distanceThreshold)
@@ -81,12 +84,14 @@ public class IKStateHang : IKState
             RightHandConnected = true;
             Context.RightHandIKConstraint.data.target.transform.position =
                 Context.TargetRightHandStep.transform.position;
+            Context.LeftFootIKConstraint.data.target.transform.position =
+                Context.TargetLeftFootStep.transform.position;
         }
     }
 
     public void AssignLadderClimbPositions()
     {
-        Context.SetAllTargetSteps();
+        Context.SetAllStartingSteps();
     }
 
     public void TestInputs()
@@ -97,30 +102,42 @@ public class IKStateHang : IKState
         {
             Context.LeftHandIKConstraint.data.target.transform.position +=
                 new Vector3(1 * ms, 0f, 0f);
+            Context.RightFootIKConstraint.data.target.transform.position +=
+                new Vector3(1 * ms, 0f, 0f);
         }
         if (Input.GetKey(KeyCode.W))
         {
             Context.LeftHandIKConstraint.data.target.transform.position +=
+                new Vector3(-1 * ms, 0f, 0f);
+            Context.RightFootIKConstraint.data.target.transform.position +=
                 new Vector3(-1 * ms, 0f, 0f);
         }
         if (Input.GetKey(KeyCode.A))
         {
             Context.LeftHandIKConstraint.data.target.transform.position +=
                 new Vector3(0f, 1 * ms, 0f);
+            Context.RightFootIKConstraint.data.target.transform.position +=
+                new Vector3(0f, 1 * ms, 0f);
         }
         if (Input.GetKey(KeyCode.S))
         {
             Context.LeftHandIKConstraint.data.target.transform.position +=
+                new Vector3(0f, -1 * ms, 0f);
+            Context.RightFootIKConstraint.data.target.transform.position +=
                 new Vector3(0f, -1 * ms, 0f);
         }
         if (Input.GetKey(KeyCode.Z))
         {
             Context.LeftHandIKConstraint.data.target.transform.position +=
                 new Vector3(0f, 0f, 1 * ms);
+            Context.RightFootIKConstraint.data.target.transform.position +=
+                new Vector3(0f, 0f, 1 * ms);
         }
         if (Input.GetKey(KeyCode.X))
         {
             Context.LeftHandIKConstraint.data.target.transform.position +=
+                new Vector3(0f, 0f, -1 * ms);
+            Context.RightFootIKConstraint.data.target.transform.position +=
                 new Vector3(0f, 0f, -1 * ms);
         }
 
@@ -128,30 +145,42 @@ public class IKStateHang : IKState
         {
             Context.RightHandIKConstraint.data.target.transform.position +=
                 new Vector3(1 * ms, 0f, 0f);
+            Context.LeftFootIKConstraint.data.target.transform.position +=
+                new Vector3(1 * ms, 0f, 0f);
         }
         if (Input.GetKey(KeyCode.U))
         {
             Context.RightHandIKConstraint.data.target.transform.position +=
                 new Vector3(-1 * ms, 0f, 0f);
+            Context.LeftFootIKConstraint.data.target.transform.position +=
+                new Vector3(-1 * ms, 0f, 0f);
         }
         if (Input.GetKey(KeyCode.H))
         {
             Context.RightHandIKConstraint.data.target.transform.position +=
-                new Vector3(0f, 1 * ms, 0f);
+                new Vector3(0f, 1f * ms, 0f);
+            Context.LeftFootIKConstraint.data.target.transform.position +=
+                new Vector3(0f, 1f * ms, 0f);
         }
         if (Input.GetKey(KeyCode.J))
         {
             Context.RightHandIKConstraint.data.target.transform.position +=
-                new Vector3(0f, -1 * ms, 0f);
+                new Vector3(0f, -1f * ms, 0f);
+            Context.LeftFootIKConstraint.data.target.transform.position +=
+                new Vector3(0f, -1f * ms, 0f);
         }
         if (Input.GetKey(KeyCode.N))
         {
             Context.RightHandIKConstraint.data.target.transform.position +=
                 new Vector3(0f, 0f, 1 * ms);
+            Context.LeftFootIKConstraint.data.target.transform.position +=
+                new Vector3(0f, 0f, 1 * ms);
         }
         if (Input.GetKey(KeyCode.M))
         {
             Context.RightHandIKConstraint.data.target.transform.position +=
+                new Vector3(0f, 0f, -1 * ms);
+            Context.LeftFootIKConstraint.data.target.transform.position +=
                 new Vector3(0f, 0f, -1 * ms);
         }
     }

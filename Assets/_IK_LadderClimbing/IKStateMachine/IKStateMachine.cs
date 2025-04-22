@@ -21,6 +21,7 @@ public class IKStateMachine : StateMachine<IKStateMachine.EState>
     [SerializeField] private TwoBoneIKConstraint _rightFootIKConstraint;
     [SerializeField] private MultiAimConstraint _headMultiAimConstraint;
     [SerializeField] private MultiParentConstraint _hipsMultiParentConstraint;
+    [SerializeField] private Transform _hipsTarget;
     [Space(1)]
     [Header("Components")]
     [SerializeField] private Rigidbody _rootRigidbody;
@@ -38,7 +39,6 @@ public class IKStateMachine : StateMachine<IKStateMachine.EState>
         InitializeStates();
         ConstructEnvironmentDetectionCollider();
     }
-
 
     protected override void UpdateInputs()
     {
@@ -61,7 +61,7 @@ public class IKStateMachine : StateMachine<IKStateMachine.EState>
     private void InitializeContext()
     {
         _context = new IKContext(_leftHandIKConstraint, _rightHandIKConstraint, _leftFootIKConstraint, _rightFootIKConstraint,
-            _headMultiAimConstraint, _hipsMultiParentConstraint, _rootRigidbody, _rootCollider, _characterLocomotion);
+            _headMultiAimConstraint, _hipsMultiParentConstraint, _rootRigidbody, _rootCollider, _characterLocomotion, _hipsTarget);
     }
 
     private void InitializeStates()

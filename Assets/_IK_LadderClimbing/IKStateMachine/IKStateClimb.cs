@@ -1,5 +1,5 @@
+using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.Rendering;
 
 public class IKStateClimb : IKState
 {
@@ -9,11 +9,12 @@ public class IKStateClimb : IKState
         UPDATE,
         FINISH,
     }
-    public float ClimbSpeed = 0.5f;
     public int RemainingSteps;
 
     public Vector3 StepHandStartingPosition;
     public Vector3 StepFootStartingPosition;
+    public Vector3 StepHipsStartingPosition;
+    public Vector3 StepHeadStartingPosition;
     public float LerpPosition = 0f;
     public float LerpSpeed = 0.5f;
 
@@ -33,7 +34,7 @@ public class IKStateClimb : IKState
     {
         if(Context.CheckLastStep())
         {
-            RemainingSteps = 0;
+            ClimbState = FinishClimbStep();
             return;
         }
 
@@ -71,19 +72,20 @@ public class IKStateClimb : IKState
 
     public EClimbState StartClimbStep()
     {
-        Debug.Log("Start Climb");
         if (Context.ClimbingSide == IKContext.EClimbingSide.RIGHT)
-        {
-            StepHandStartingPosition = Context.RightHandIKConstraint.data.target.transform.position;
-            StepFootStartingPosition = Context.LeftFootIKConstraint.data.target.transform.position;
-        }
-        else
         {
             StepHandStartingPosition = Context.LeftHandIKConstraint.data.target.transform.position;
             StepFootStartingPosition = Context.RightFootIKConstraint.data.target.transform.position;
         }
+        else
+        {
+            StepHandStartingPosition = Context.RightHandIKConstraint.data.target.transform.position;
+            StepFootStartingPosition = Context.LeftFootIKConstraint.data.target.transform.position;
+        }
+
 
         Context.SetAllTargetSteps();
+
         return EClimbState.UPDATE;
     }
 
@@ -94,21 +96,29 @@ public class IKStateClimb : IKState
         if (Context.ClimbingSide == IKContext.EClimbingSide.RIGHT)
         {
             Context.RightHandIKConstraint.data.target.transform.position =
-                Vector3.Lerp(StepHandStartingPosition, Context.TargetRightHandStep.transform.position, LerpPosition);
+                Context.CurrentRightHandStep.transform.position;
             Context.LeftFootIKConstraint.data.target.transform.position =
-                Vector3.Lerp(StepFootStartingPosition, Context.TargetLeftFootStep.transform.position, LerpPosition);
-            LerpPosition += Time.deltaTime / LerpSpeed;
-        }
-        else
-        {
+                Context.CurrentLeftFootStep.transform.position;
+
             Context.LeftHandIKConstraint.data.target.transform.position =
                 Vector3.Lerp(StepHandStartingPosition, Context.TargetLeftHandStep.transform.position, LerpPosition);
             Context.RightFootIKConstraint.data.target.transform.position =
                 Vector3.Lerp(StepFootStartingPosition, Context.TargetRightFootStep.transform.position, LerpPosition);
             LerpPosition += Time.deltaTime / LerpSpeed;
         }
+        else
+        {
+            Context.LeftHandIKConstraint.data.target.transform.position =
+                Context.CurrentLeftHandStep.transform.position;
+            Context.RightFootIKConstraint.data.target.transform.position =
+                Context.CurrentRightFootStep.transform.position;
 
-        // Set hips to middle y position between hands and feet
+            Context.RightHandIKConstraint.data.target.transform.position =
+                Vector3.Lerp(StepHandStartingPosition, Context.TargetRightHandStep.transform.position, LerpPosition);
+            Context.LeftFootIKConstraint.data.target.transform.position =
+                Vector3.Lerp(StepFootStartingPosition, Context.TargetLeftFootStep.transform.position, LerpPosition);
+            LerpPosition += Time.deltaTime / LerpSpeed;
+        }
 
         return EClimbState.UPDATE;
     }

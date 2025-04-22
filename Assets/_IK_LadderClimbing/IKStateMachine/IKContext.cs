@@ -12,7 +12,7 @@ public class IKContext
 
     public IKContext(TwoBoneIKConstraint leftHandIK, TwoBoneIKConstraint rightHandIK, TwoBoneIKConstraint leftFootIK, TwoBoneIKConstraint rightFootIK,
         MultiAimConstraint headMultiAim, MultiParentConstraint hipsMultiParent, Rigidbody rootRigidbody, CapsuleCollider rootCollider,
-        CharacterLocomotion characterLocomotion)
+        CharacterLocomotion characterLocomotion, Transform hipsTarget)
     {
         _leftHandIKConstraint = leftHandIK;
         _rightHandIKConstraint = rightHandIK;
@@ -23,6 +23,7 @@ public class IKContext
         _rootRigidbody = rootRigidbody;
         _rootCollider = rootCollider;
         _characterLocomotion = characterLocomotion;
+        _hipsTarget = hipsTarget;
     }
 
     private TwoBoneIKConstraint _leftHandIKConstraint;
@@ -35,6 +36,7 @@ public class IKContext
     private CapsuleCollider _rootCollider;
     private CharacterLocomotion _characterLocomotion;
     private Collider _currentIntersectingLadder;
+    private Transform _hipsTarget;
 
     public TwoBoneIKConstraint LeftHandIKConstraint => _leftHandIKConstraint;
     public TwoBoneIKConstraint RightHandIKConstraint => _rightHandIKConstraint;
@@ -45,6 +47,7 @@ public class IKContext
     public Rigidbody RootRigidbody => _rootRigidbody;
     public CapsuleCollider RootCollider => _rootCollider;
     public CharacterLocomotion CharacterLocomotion => _characterLocomotion;
+    public Transform HipsTarget => _hipsTarget;
 
     public Collider CurrentIntersectingLadder
     {
@@ -87,6 +90,8 @@ public class IKContext
 
     public Vector3 Input3D = Vector3.zero;
     public bool InputButton = false;
+    public float DistanceBetweenSteps => GetDistanceBetweenSteps();
+    public const int FullBodyStepsDistance = 5;
 
     public void EnableAllIKImmediate()
     {
@@ -156,12 +161,21 @@ public class IKContext
         return closestLadderStep;
     }
 
-    public LadderStep GetNextLadderStep(LadderStep step, List<LadderStep> steps)
+    public LadderStep GetNextLadderStepHand(LadderStep step, List<LadderStep> steps)
     {
-        if (IsLastStep(step, steps))
+        if (IsLastStepHand(step, steps)) return steps[steps.Count - 1];
+
+        if (steps.Contains(step)) return steps[steps.IndexOf(step) + 1];
+        else
         {
+            Debug.LogError("Next step not found in list of steps.");
             return null;
         }
+    }
+
+    public LadderStep GetNextLadderStepSkipOneHand(LadderStep step, List<LadderStep> steps)
+    {
+        if (IsLastStepHand(step, steps, stepSkip:2)) return steps[steps.Count - 1];
 
         if (steps.Contains(step)) return steps[steps.IndexOf(step) + 2];
         else
@@ -171,19 +185,60 @@ public class IKContext
         }
     }
 
-    public bool IsLastStep(LadderStep step, List<LadderStep> steps)
+    public LadderStep GetNextLadderStepFoot(LadderStep step, List<LadderStep> steps)
     {
-        return steps.IndexOf(step) + 2 > steps.Count - 1;
+        if (IsLastStepFoot(step, steps)) return steps[steps.Count - FullBodyStepsDistance];
+
+        if (steps.Contains(step)) return steps[steps.IndexOf(step) + 1];
+        else
+        {
+            Debug.LogError("Next step not found in list of steps.");
+            return null;
+        }
+    }
+
+    public LadderStep GetNextLadderStepSkipOneFoot(LadderStep step, List<LadderStep> steps)
+    {
+        if (IsLastStepFoot(step, steps, stepSkip:2)) return steps[steps.Count - FullBodyStepsDistance];
+
+        if (steps.Contains(step)) return steps[steps.IndexOf(step) + 2];
+        else
+        {
+            Debug.LogError("Next step not found in list of steps.");
+            return null;
+        }
+    }
+
+    public bool IsLastStepHand(LadderStep step, List<LadderStep> steps, int stepSkip=1)
+    {
+        return steps.IndexOf(step) + stepSkip > steps.Count - 1;
+    }
+
+    public bool IsLastStepFoot(LadderStep step, List<LadderStep> steps, int stepSkip=1, int stepDistance=FullBodyStepsDistance)
+    {
+        return steps.IndexOf(step) + stepSkip > steps.Count - stepDistance;
     }
 
     public bool CheckLastStep()
     {
         if (ClimbingSide == EClimbingSide.RIGHT)
-            if (IsLastStep(CurrentRightHandStep, LadderStepsRight)) return true;
+            if (IsLastStepHand(CurrentRightHandStep, LadderStepsRight)) return true;
         else
-            if (IsLastStep(CurrentLeftHandStep, LadderStepsLeft)) return true;
+            if (IsLastStepHand(CurrentLeftHandStep, LadderStepsLeft)) return true;
 
         return false;
+    }
+    public void SetAllStartingSteps()
+    {
+        CurrentLeftHandStep = GetClosestLadderStepToIKBone(LeftHandIKConstraint, LadderStepsLeft);
+        CurrentRightHandStep = GetClosestLadderStepToIKBone(RightHandIKConstraint, LadderStepsRight);
+        CurrentLeftFootStep = GetClosestLadderStepToIKBone(LeftFootIKConstraint, LadderStepsLeft);
+        CurrentRightFootStep = GetClosestLadderStepToIKBone(RightFootIKConstraint, LadderStepsRight);
+
+        TargetLeftHandStep = GetNextLadderStepHand(CurrentLeftHandStep, LadderStepsLeft);
+        TargetRightHandStep = GetNextLadderStepSkipOneHand(CurrentRightHandStep, LadderStepsRight);
+        TargetLeftFootStep = GetNextLadderStepSkipOneFoot(CurrentLeftFootStep, LadderStepsLeft);
+        TargetRightFootStep = GetNextLadderStepFoot(CurrentRightFootStep, LadderStepsRight);
     }
 
     public void SetAllTargetSteps()
@@ -193,9 +248,16 @@ public class IKContext
         CurrentLeftFootStep = GetClosestLadderStepToIKBone(LeftFootIKConstraint, LadderStepsLeft);
         CurrentRightFootStep = GetClosestLadderStepToIKBone(RightFootIKConstraint, LadderStepsRight);
 
-        TargetLeftHandStep = GetNextLadderStep(CurrentLeftHandStep, LadderStepsLeft);
-        TargetRightHandStep = GetNextLadderStep(CurrentRightHandStep, LadderStepsRight);
-        TargetLeftFootStep = GetNextLadderStep(CurrentLeftFootStep, LadderStepsLeft);
-        TargetRightFootStep = GetNextLadderStep(CurrentRightFootStep, LadderStepsRight);
+        TargetLeftHandStep = GetNextLadderStepSkipOneHand(CurrentLeftHandStep, LadderStepsLeft);
+        TargetRightHandStep = GetNextLadderStepSkipOneHand(CurrentRightHandStep, LadderStepsRight);
+        TargetLeftFootStep = GetNextLadderStepSkipOneFoot(CurrentLeftFootStep, LadderStepsLeft);
+        TargetRightFootStep = GetNextLadderStepSkipOneFoot(CurrentRightFootStep, LadderStepsRight);
+    }
+
+    private float GetDistanceBetweenSteps()
+    {
+        return ClimbingSide == EClimbingSide.RIGHT?
+            Vector3.Distance(CurrentRightFootStep.transform.position, TargetRightFootStep.transform.position)
+            : Vector3.Distance(CurrentLeftFootStep.transform.position, TargetLeftFootStep.transform.position);
     }
 }
