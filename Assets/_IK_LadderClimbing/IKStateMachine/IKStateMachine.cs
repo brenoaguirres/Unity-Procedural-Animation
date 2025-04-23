@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
 using UnityEngine.Assertions;
@@ -32,6 +33,9 @@ public class IKStateMachine : StateMachine<IKStateMachine.EState>
     [Header("Inputs")]
     [SerializeField] private Vector3 _input3D = Vector3.zero;
     [SerializeField] private bool _inputButton = false;
+    [Space(1)]
+    [Header("Rig")]
+    [SerializeField] private Rig _rig;
 
     private void Awake()
     {
@@ -57,12 +61,13 @@ public class IKStateMachine : StateMachine<IKStateMachine.EState>
         Assert.IsNotNull(_rightFootIKConstraint, "Right Foot IK Constraint not assigned in inspector.");
         Assert.IsNotNull(_headMultiAimConstraint, "Head Multi Aim Constraint not assigned in inspector.");
         Assert.IsNotNull(_hipsMultiParentConstraint, "Hips Multi Parent Constraint not assigned in inspector.");
+        Assert.IsNotNull(_rig, "Rig not assigned in inspector.");
     }
 
     private void InitializeContext()
     {
         _context = new IKContext(_leftHandIKConstraint, _rightHandIKConstraint, _leftFootIKConstraint, _rightFootIKConstraint,
-            _headMultiAimConstraint, _hipsMultiParentConstraint, _rootRigidbody, _rootCollider, _characterLocomotion, _hipsTarget, _hipsTargetRotation);
+            _headMultiAimConstraint, _hipsMultiParentConstraint, _rootRigidbody, _rootCollider, _characterLocomotion, _hipsTarget, _hipsTargetRotation, _rig);
     }
 
     private void InitializeStates()

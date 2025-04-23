@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class IKStateHang : IKState
@@ -6,6 +7,9 @@ public class IKStateHang : IKState
     private bool LeftHandConnected;
     private bool RightHandConnected;
 
+    private bool IsConnectedToLadder;
+    private float _timeToStartRig = 0.8f;
+
     public IKStateHang(IKContext context, IKStateMachine.EState key) : base(context, key)
     {
         Context = context;
@@ -13,16 +17,20 @@ public class IKStateHang : IKState
     public override void EnterState() 
     {
         Debug.Log("Enter HANG State");
-        Context.DisableLocomotion();
-        Context.EnableAllIKImmediate();
-        CorrectCharacterRotation();
-        AssignLadderClimbPositions();
+        StartRigBehaviour();
+
         LeftHandConnected = false;
         RightHandConnected = false;
         CanClimb = false;
     }
     public override void UpdateState() 
     {
+        if (!IsConnectedToLadder)
+        {
+            IsConnectedToLadder = UpdateRigBehaviour();
+            return;
+        }
+
         TestInputs();
         CheckHandsConnected();
         if (LeftHandConnected && RightHandConnected) CanClimb = true;
@@ -89,17 +97,29 @@ public class IKStateHang : IKState
         }
     }
 
-    public void CorrectCharacterRotation()
+    public void StartRigBehaviour()
     {
         if (Context.IsStartingLadderInteraction)
+        {
+            Context.DisableLocomotion();
             Context.AddRotationToHips();
+            Context.SetAllStartingSteps();
+        }
     }
+
+    public bool UpdateRigBehaviour()
+    {
+        if (Context.IsStartingLadderInteraction)
+        {
+            Context.Rig.weight = Mathf.Lerp(0f, 1f, Time.deltaTime / _timeToStartRig);
+        }
+
+        return Context.Rig.weight >= 1f;
+    }
+
     public void AssignLadderClimbPositions()
     {
-        if (Context.IsStartingLadderInteraction)
-            Context.SetAllStartingSteps();
-        else
-            Context.SetAllTargetSteps();
+        Context.SetAllTargetSteps();
     }
 
     public void TestInputs()

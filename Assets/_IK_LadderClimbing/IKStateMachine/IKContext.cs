@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
@@ -12,7 +13,7 @@ public class IKContext
 
     public IKContext(TwoBoneIKConstraint leftHandIK, TwoBoneIKConstraint rightHandIK, TwoBoneIKConstraint leftFootIK, TwoBoneIKConstraint rightFootIK,
         MultiAimConstraint headMultiAim, MultiParentConstraint hipsMultiParent, Rigidbody rootRigidbody, CapsuleCollider rootCollider,
-        CharacterLocomotion characterLocomotion, Transform hipsTarget, Transform hipsTargetRotation)
+        CharacterLocomotion characterLocomotion, Transform hipsTarget, Transform hipsTargetRotation, Rig rig)
     {
         _leftHandIKConstraint = leftHandIK;
         _rightHandIKConstraint = rightHandIK;
@@ -25,6 +26,7 @@ public class IKContext
         _characterLocomotion = characterLocomotion;
         _hipsTarget = hipsTarget;
         _hipsTargetRotation = hipsTargetRotation;
+        _rig = rig;
     }
 
     private TwoBoneIKConstraint _leftHandIKConstraint;
@@ -99,6 +101,8 @@ public class IKContext
     public bool IsStartingLadderInteraction = true;
 
     public Vector3 HipsRotationAngleInLadder = new Vector3(0, 0, 20);
+
+    public Rig Rig;
 
     public void EnableAllIKImmediate()
     {
