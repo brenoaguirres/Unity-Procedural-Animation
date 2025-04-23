@@ -53,6 +53,7 @@ public class IKContext
     public CharacterLocomotion CharacterLocomotion => _characterLocomotion;
     public Transform HipsTarget => _hipsTarget;
     public Transform HipsTargetRotation => _hipsTargetRotation;
+    public Rig _rig;
 
     public Collider CurrentIntersectingLadder
     {
@@ -102,26 +103,16 @@ public class IKContext
 
     public Vector3 HipsRotationAngleInLadder = new Vector3(0, 0, 20);
 
-    public Rig Rig;
+    public Rig Rig => _rig;
 
     public void EnableAllIKImmediate()
     {
-        LeftHandIKConstraint.weight = 1f;
-        RightHandIKConstraint.weight = 1f;
-        LeftFootIKConstraint.weight = 1f;
-        RightFootIKConstraint.weight = 1f;
-        HeadMultiAimConstraint.weight = 1f;
-        HipsMultiParentConstraint.weight = 1f;
+        Rig.weight = 1f;
     }
 
     public void DisableAllIKImmediate()
     {
-        LeftHandIKConstraint.weight = 0f;
-        RightHandIKConstraint.weight = 0f;
-        LeftFootIKConstraint.weight = 0f;
-        RightFootIKConstraint.weight = 0f;
-        HeadMultiAimConstraint.weight = 0f;
-        HipsMultiParentConstraint.weight = 0f;
+        Rig.weight = 0f;
     }
 
     public void AddRotationToHips()

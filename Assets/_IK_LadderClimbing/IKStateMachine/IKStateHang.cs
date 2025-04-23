@@ -8,7 +8,8 @@ public class IKStateHang : IKState
     private bool RightHandConnected;
 
     private bool IsConnectedToLadder;
-    private float _timeToStartRig = 0.8f;
+    private float _timeToStartRig = 0.25f;
+    private float _timeElapsed = 0f;
 
     public IKStateHang(IKContext context, IKStateMachine.EState key) : base(context, key)
     {
@@ -31,6 +32,7 @@ public class IKStateHang : IKState
             return;
         }
 
+        Debug.Log("Test");
         TestInputs();
         CheckHandsConnected();
         if (LeftHandConnected && RightHandConnected) CanClimb = true;
@@ -111,7 +113,9 @@ public class IKStateHang : IKState
     {
         if (Context.IsStartingLadderInteraction)
         {
-            Context.Rig.weight = Mathf.Lerp(0f, 1f, Time.deltaTime / _timeToStartRig);
+            _timeElapsed += Time.deltaTime / _timeToStartRig;
+
+            Context.Rig.weight = Mathf.Lerp(0f, 1f, _timeElapsed);
         }
 
         return Context.Rig.weight >= 1f;

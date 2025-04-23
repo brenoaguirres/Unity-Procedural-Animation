@@ -9887,6 +9887,7 @@ MonoBehaviour:
   _characterLocomotion: {fileID: 8011135464445536534}
   _input3D: {x: 0, y: 0, z: 0}
   _inputButton: 0
+  _rig: {fileID: 704775605}
 --- !u!1 &7938702603138229540
 GameObject:
   m_ObjectHideFlags: 0
