@@ -12,7 +12,7 @@ public class IKContext
 
     public IKContext(TwoBoneIKConstraint leftHandIK, TwoBoneIKConstraint rightHandIK, TwoBoneIKConstraint leftFootIK, TwoBoneIKConstraint rightFootIK,
         MultiAimConstraint headMultiAim, MultiParentConstraint hipsMultiParent, Rigidbody rootRigidbody, CapsuleCollider rootCollider,
-        CharacterLocomotion characterLocomotion, Transform hipsTarget)
+        CharacterLocomotion characterLocomotion, Transform hipsTarget, Transform hipsTargetRotation)
     {
         _leftHandIKConstraint = leftHandIK;
         _rightHandIKConstraint = rightHandIK;
@@ -24,6 +24,7 @@ public class IKContext
         _rootCollider = rootCollider;
         _characterLocomotion = characterLocomotion;
         _hipsTarget = hipsTarget;
+        _hipsTargetRotation = hipsTargetRotation;
     }
 
     private TwoBoneIKConstraint _leftHandIKConstraint;
@@ -37,6 +38,7 @@ public class IKContext
     private CharacterLocomotion _characterLocomotion;
     private Collider _currentIntersectingLadder;
     private Transform _hipsTarget;
+    private Transform _hipsTargetRotation;
 
     public TwoBoneIKConstraint LeftHandIKConstraint => _leftHandIKConstraint;
     public TwoBoneIKConstraint RightHandIKConstraint => _rightHandIKConstraint;
@@ -48,6 +50,7 @@ public class IKContext
     public CapsuleCollider RootCollider => _rootCollider;
     public CharacterLocomotion CharacterLocomotion => _characterLocomotion;
     public Transform HipsTarget => _hipsTarget;
+    public Transform HipsTargetRotation => _hipsTargetRotation;
 
     public Collider CurrentIntersectingLadder
     {
@@ -95,6 +98,8 @@ public class IKContext
 
     public bool IsStartingLadderInteraction = true;
 
+    public Vector3 HipsRotationAngleInLadder = new Vector3(0, 0, 20);
+
     public void EnableAllIKImmediate()
     {
         LeftHandIKConstraint.weight = 1f;
@@ -113,6 +118,11 @@ public class IKContext
         RightFootIKConstraint.weight = 0f;
         HeadMultiAimConstraint.weight = 0f;
         HipsMultiParentConstraint.weight = 0f;
+    }
+
+    public void AddRotationToHips()
+    {
+        HipsTargetRotation.rotation *= Quaternion.Euler(HipsRotationAngleInLadder);
     }
 
     public void EnableLocomotion()

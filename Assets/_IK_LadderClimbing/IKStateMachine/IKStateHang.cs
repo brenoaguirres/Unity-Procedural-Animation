@@ -15,6 +15,7 @@ public class IKStateHang : IKState
         Debug.Log("Enter HANG State");
         Context.DisableLocomotion();
         Context.EnableAllIKImmediate();
+        CorrectCharacterRotation();
         AssignLadderClimbPositions();
         LeftHandConnected = false;
         RightHandConnected = false;
@@ -88,6 +89,11 @@ public class IKStateHang : IKState
         }
     }
 
+    public void CorrectCharacterRotation()
+    {
+        if (Context.IsStartingLadderInteraction)
+            Context.AddRotationToHips();
+    }
     public void AssignLadderClimbPositions()
     {
         if (Context.IsStartingLadderInteraction)

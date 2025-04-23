@@ -22,6 +22,7 @@ public class IKStateMachine : StateMachine<IKStateMachine.EState>
     [SerializeField] private MultiAimConstraint _headMultiAimConstraint;
     [SerializeField] private MultiParentConstraint _hipsMultiParentConstraint;
     [SerializeField] private Transform _hipsTarget;
+    [SerializeField] private Transform _hipsTargetRotation;
     [Space(1)]
     [Header("Components")]
     [SerializeField] private Rigidbody _rootRigidbody;
@@ -61,7 +62,7 @@ public class IKStateMachine : StateMachine<IKStateMachine.EState>
     private void InitializeContext()
     {
         _context = new IKContext(_leftHandIKConstraint, _rightHandIKConstraint, _leftFootIKConstraint, _rightFootIKConstraint,
-            _headMultiAimConstraint, _hipsMultiParentConstraint, _rootRigidbody, _rootCollider, _characterLocomotion, _hipsTarget);
+            _headMultiAimConstraint, _hipsMultiParentConstraint, _rootRigidbody, _rootCollider, _characterLocomotion, _hipsTarget, _hipsTargetRotation);
     }
 
     private void InitializeStates()
