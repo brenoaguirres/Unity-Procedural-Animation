@@ -38,6 +38,9 @@ public class VRHandTrackingImproved : MonoBehaviour
     [Header("Animation Rigging IK Settings")]
     public TwoBoneIKConstraint ikConstraint;
 
+    [Header("VR Rig Root")]
+    public Transform vrRigRoot;
+
     private void Start()
     {
         Initialize();
@@ -62,16 +65,30 @@ public class VRHandTrackingImproved : MonoBehaviour
     }
     private void UpdateTrackingPosition()
     {
-        Vector3 targetPosition = vrController.position + vrController.TransformDirection(positionOffset);
+        // Convert controller position to rig root local space
+        Vector3 localControllerPosition = vrRigRoot.InverseTransformPoint(vrController.position);
+
+        // Apply position offset in local space
+        Vector3 localTargetPosition = localControllerPosition + positionOffset;
+
+        // Convert back to world space
+        Vector3 targetPosition = vrRigRoot.TransformPoint(localTargetPosition);
+
+        // Interpolate position
         ikTarget.position = Vector3.Lerp(ikTarget.position, targetPosition, 1f - positionSmoothness);
 
-        // Improved rotation handling
+        // Rotation handling remains the same
+        Quaternion worldToLocal = Quaternion.Inverse(vrRigRoot.rotation);
+        Quaternion relativeControllerRotation = worldToLocal * vrController.rotation;
+
         Quaternion offsetRotation = Quaternion.Euler(rotationOffset);
-        Quaternion targetRotation = vrController.rotation * offsetRotation;
+        Quaternion targetRotation = vrRigRoot.rotation * (relativeControllerRotation * offsetRotation);
+
         ikTarget.rotation = Quaternion.Lerp(ikTarget.rotation, targetRotation, 1f - rotationSmoothness);
 
         ClampBoundaries();
     }
+
 
     private void UpdateState()
     {
@@ -132,7 +149,11 @@ public class VRHandTrackingImproved : MonoBehaviour
         positionOffset = ikTarget.position - vrController.position;
 
         // Improved rotation offset calculation
-        Quaternion relativeRotation = Quaternion.Inverse(vrController.rotation) * ikTarget.rotation;
+        Quaternion worldToLocal = Quaternion.Inverse(vrRigRoot.rotation);
+        Quaternion relativeControllerRotation = worldToLocal * vrController.rotation;
+        Quaternion relativeIKTargetRotation = worldToLocal * ikTarget.rotation;
+
+        Quaternion relativeRotation = Quaternion.Inverse(relativeControllerRotation) * relativeIKTargetRotation;
         rotationOffset = relativeRotation.eulerAngles;
     }
 

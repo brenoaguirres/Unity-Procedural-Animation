@@ -1,3 +1,4 @@
+/*
 using UnityEngine;
 using Meta.XR.BuildingBlocks;
 
@@ -88,3 +89,4 @@ public class Talabarte : MonoBehaviour
         }
     }
 }
+*/
