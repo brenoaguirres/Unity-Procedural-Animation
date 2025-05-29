@@ -1,92 +1,141 @@
-/*
 using UnityEngine;
-using Meta.XR.BuildingBlocks;
+using System;
+using System.Collections;
 
 public class Talabarte : MonoBehaviour
 {
-    private MetaGrabbable grabbable;
-    private Rigidbody rb;
-    private BoxCollider boxCollider;
+    public enum SnapState { Free, Hand, LadderSnap, Belt }
 
-    public bool attached = false;
-    public Transform currentParent;
+    public bool isDebug = true;
+    public float cooldownSnap = 1f;
 
-    private void Awake()
+    public Action OnHandSnap;
+    public Action OnBeltSnap;
+    public Action OnLadderSnap;
+
+    private bool canSnap = true;
+    private float cooldownTimer = 0f;
+
+    private SnapState currentSnapState = SnapState.Free;
+
+    [SerializeField] private TalabarteManager talabarteManager;
+
+    private void Start()
     {
-        // Find the grabbable component in the child
-        grabbable = GetComponentInChildren<MetaGrabbable>();
-
-        if (grabbable == null)
-        {
-            Debug.LogError("No MetaGrabbable found in child objects.");
-            return;
-        }
-
-        rb = grabbable.GetComponent<Rigidbody>();
-        if (rb == null)
-        {
-            Debug.LogError("No Rigidbody found on MetaGrabbable object.");
-            return;
-        }
-
-        boxCollider = grabbable.GetComponent<BoxCollider>();
-        if (boxCollider == null)
-        {
-            Debug.LogError("No BoxCollider found on MetaGrabbable object.");
-            return;
-        }
-
-        // Subscribe to grab events
-        grabbable.OnGrabStarted.AddListener(OnGrab);
-        grabbable.OnGrabEnded.AddListener(OnRelease);
-    }
-
-    private void OnDestroy()
-    {
-        if (grabbable != null)
-        {
-            grabbable.OnGrabStarted.RemoveListener(OnGrab);
-            grabbable.OnGrabEnded.RemoveListener(OnRelease);
-        }
+        Collider col = GetComponent<Collider>();
+        if (col != null) col.isTrigger = true;
     }
 
     private void Update()
     {
-        if (attached && currentParent != null)
+        UpdateCooldown();
+    }
+
+    private void UpdateCooldown()
+    {
+        if (!canSnap)
         {
-            grabbable.transform.localPosition = Vector3.zero;
-            grabbable.transform.localRotation = Quaternion.identity;
+            cooldownTimer -= Time.deltaTime;
+            if (cooldownTimer <= 0f)
+            {
+                canSnap = true;
+                cooldownTimer = 0f;
+            }
         }
     }
 
-    private void OnGrab()
+    public void EnablePhysics()
     {
-        DisablePhysics();
+        Rigidbody rb = GetComponent<Rigidbody>();
+        if (rb)
+        {
+            rb.isKinematic = false;
+            rb.useGravity = true;
+        }
     }
 
-    private void OnRelease()
+    public void DisablePhysics()
     {
-        EnablePhysics();
-    }
-
-    private void DisablePhysics()
-    {
-        if (boxCollider != null) boxCollider.isTrigger = true;
-        if (rb != null)
+        Rigidbody rb = GetComponent<Rigidbody>();
+        if (rb)
         {
             rb.isKinematic = true;
             rb.useGravity = false;
         }
     }
 
-    private void EnablePhysics()
+    private void OnTriggerEnter(Collider other)
     {
-        if (boxCollider != null) boxCollider.isTrigger = false;
-        if (rb != null)
+        TrySnap(other);
+    }
+
+    private void OnTriggerStay(Collider other)
+    {
+        TrySnap(other);
+    }
+
+    private void TrySnap(Collider other)
+    {
+        if (!canSnap) return;
+
+        SnapState state = SnapState.Free;
+        switch (other.tag)
         {
-            rb.isKinematic = false;
-            rb.useGravity = true;
+            case "Hand":
+                state = SnapState.Hand;
+                break;
+            case "Belt":
+                state = SnapState.Belt;
+                break;
+            case "LadderSnap":
+                state = SnapState.LadderSnap;
+                break;
+            default:
+                return;
+        }
+
+        Snap(other.transform, state);
+    }
+
+    public void Snap(Transform target, SnapState newState)
+    {
+        if (currentSnapState == SnapState.LadderSnap) return;
+        if (currentSnapState == newState) return;
+
+        transform.SetParent(target);
+        transform.localPosition = Vector3.zero;
+        transform.localRotation = Quaternion.identity;
+
+        currentSnapState = newState;
+        canSnap = false;
+        cooldownTimer = cooldownSnap;
+
+        switch (newState)
+        {
+            case SnapState.Hand:
+                OnHandSnap?.Invoke();
+                if (isDebug) Debug.Log("OnHandSnap");
+                break;
+            case SnapState.Belt:
+                OnBeltSnap?.Invoke();
+                if (isDebug) Debug.Log("OnBeltSnap");
+                break;
+            case SnapState.LadderSnap:
+                OnLadderSnap?.Invoke();
+                if (isDebug) Debug.Log("OnLadderSnap");
+                talabarteManager?.OnTalabarteLadderSnapped(); // Notify manager
+                break;
         }
     }
+
+    public void ResetToBelt(Transform beltTransform)
+    {
+        Snap(beltTransform, SnapState.Belt);
+    }
+
+    public void UnlockLadderSnapped()
+    {
+        currentSnapState = SnapState.Free;
+        canSnap = true;
+    }
 }
-*/

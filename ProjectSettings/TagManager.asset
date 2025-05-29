@@ -6,6 +6,9 @@ TagManager:
   tags:
   - Ladder
   - LadderStep
+  - Hand
+  - Belt
+  - LadderSnap
   layers:
   - Default
   - TransparentFX
